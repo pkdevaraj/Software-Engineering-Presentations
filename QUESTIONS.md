@@ -3,7 +3,9 @@
 Submitted by - Praveen Kumar Devaraj (prde1873) and Sharath Vontari (shvo9450)
 
 1. Using the material that we have covered in Lectures 8, 9, and 10, explain 1 why the broken program doesn't work. What concurrency-related problems are occurring in this program? If you see the program end in livelock, then describe what is happening with the threads. Why can't they make progress? If you see the program end in another way, such as getting to the point where it prints out the product ids but doesn't include all of them, explain why you think that happened. Note: If you start to add println statements to the Producers and Consumers, you may actually alter the behavior of the program! If you observe this, then also include a discussion on why that happens as well. In your answer, if you want to include snippets of code and/or output to explain what you are seeing, then do so. Use all of Markdown's capabilities to display what you need to explain the concurrency-related problems that you are observing.
-Solution:	
+
+#Solution:	
+
 In this program the consumer tries to de-queue the product which is inserted by the producer onto the queue. The output of this program is as below and was terminated manually.
 Queue empty!
 
