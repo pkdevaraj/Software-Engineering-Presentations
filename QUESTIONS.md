@@ -167,3 +167,18 @@ Too many items in the queue: 17!
 In this case there are producer threads trying to add products on the queue but no consumer thread is getting control to retrieve the product from the queue. This result in a deadlock even if the methods to access the queue are synchronized as this depends on the sequence of execution of the threads as well.
 
 
+*  Now turn your attention to creating an implementation of the program that functions correctly in the fixed directory. In your answer to this question, you should discuss the approach you took to fix the problem and get your version of the program to generate output that is similar to the example_output.txt file that is included with the repo. While your output will not match theexample_output.txt file exactly, it should have a similar structure:
+  *	The beginning of the output will show the producers starting up, followed by the consumers, and then their outputs interleaving.
+  *	At some point, Producers will finish their work and announce that they are shutting down.
+  *	Consumers will then start to shut down as well as they encounter the special Products that indicate that production is done.
+  *	All of the producers will eventually shutdown followed by the last couple of consumers shutting down as well.
+  *	The last part of the file is then a list of product ids from 0 to 199 inclusive.
+  *	The monitor may generate output at any time, so it might have a message that appears in the final list of ids. That is fine, if that happens to you.
+A fixed program will then cleanly shutdown and return to the command line prompt.
+
+**Solution:**
+
+For the fix in the program, In the Consumer, we make the thread to sleep for few seconds before retrieving the data from the queue. This is done to ensure that there is one or the other producer who have pushed their product on to the queue ad thereby avoiding accessing an empty queue. The whole block of code of retrieval and addition of the products on to the map are inside a synchronized block to make sure every thread gets to access the queue sequentially.
+In the producer, we add a synchronized block for that part of code that pushes the data on to the queue. In this case the queue will eventually end up giving the control to one or the other consumer threads which would remove a product from the queue and make room for entering new products on the queue by the producers as they are synchronized.  	
+In some cases the producer thread might have added the special product on to the queue and could have shut down after which another producer adds a normal product. In such cases the consumer thread whichever retrieves the special product shuts down. This need not be the same always. 
+A sample output of the fixed program is given in output.txt file in the Fixed Directory.
