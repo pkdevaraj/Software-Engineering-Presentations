@@ -103,7 +103,8 @@ Queue empty!
 
 Queue empty!
 
-Here in this case the consumer is trying to remove an item from an empty queue. Since the queue is empty Consumer X has the control over the queue waiting for the product to be inserted but the other Producer Threads are waiting for control to insert a product onto the queue. As a result a deadlock occurs where a process acquiring the control is waiting for the data to be inserted on the queue and other processes are waiting to acquire the control to insert data on to the queue. To resolve this issue one of the process is randomly chosen which takes the control and proceeds with the execution. But it ends up with a consumer process trying to retrieve from an empty queue.
+Here in this case the consumer is trying to remove an item from an empty queue. Since the queue is empty Consumer X has the control over the queue waiting for the product to be inserted but the other Producer Threads are waiting for control to insert a product onto the queue.There is no synchronization of the threads and many threads try to access the queue at the same time. As a result a deadlock occurs where a process acquiring the control is waiting for the data to be inserted on the queue and other processes are waiting to acquire the control to insert data on to the queue. To resolve this issue one of the process is randomly chosen which takes the control and proceeds with the execution(Livelocks). But it ends up with a consumer process trying to retrieve from an empty queue.
+
 I tried adding a few print statements to debug the behavior. In this case the livelock occurred little later compared to the previous case. This could be because the processor spends some time in executing the print instruction during which other threads could access the queue and update the products on the queue (either addition or removal).
 
 
@@ -111,7 +112,7 @@ I tried adding a few print statements to debug the behavior. In this case the li
 
 **Solution:**
 
-The operation on the queue is synchronized meaning no two threads can operate on the products on the queue simultaneously, i.e. it causes a thread to obtain a lock when entering the method, so that only one thread can execute the method at the same time. Thus either the producer thread or the consumer thread can access the queue at any point in time. This synchronization helps us avoid deadlocks only when the lock on a thread is released. If the lock is not released and the thread is waiting for the resource indefinitely then there is a deadlock. Here the part of code adding or retrieving the data on the queue is not synchronized but the methods are synchronized, as a result if more threads are accessing the queue there is no guarantee of the order of execution. This results in lot of data being missed from the queue.  
+The operation on the queue is synchronized meaning no two threads can operate on the products on the queue simultaneously, i.e. it causes a thread to obtain a lock (intrinsic lock) when entering the method, so that only one thread can execute the method at the same time. Thus either the producer thread or the consumer thread can access the queue at any point in time. This synchronization helps us avoid deadlocks only when the lock on a thread is released. If the lock is not released and the thread is waiting for the resource indefinitely then there is a deadlock. Here the part of code adding or retrieving the data on the queue is not synchronized but the methods are synchronized, as a result if more threads are accessing the queue there is no guarantee of the order of execution. This results in lot of data being missed from the queue.  
 
 The output snippet of the same is shown below.
 
@@ -179,6 +180,9 @@ A fixed program will then cleanly shutdown and return to the command line prompt
 **Solution:**
 
 For the fix in the program, In the Consumer, we make the thread to sleep for few seconds before retrieving the data from the queue. This is done to ensure that there is one or the other producer who have pushed their product on to the queue ad thereby avoiding accessing an empty queue. The whole block of code of retrieval and addition of the products on to the map are inside a synchronized block to make sure every thread gets to access the queue sequentially.
-In the producer, we add a synchronized block for that part of code that pushes the data on to the queue. In this case the queue will eventually end up giving the control to one or the other consumer threads which would remove a product from the queue and make room for entering new products on the queue by the producers as they are synchronized.  	
+
+In the producer, we add a synchronized block for that part of code that pushes the data on to the queue. In this case the queue will eventually end up giving the control to one or the other consumer threads which would remove a product from the queue and make room for entering new products on the queue by the producers as they are synchronized.
+
 In some cases the producer thread might have added the special product on to the queue and could have shut down after which another producer adds a normal product. In such cases the consumer thread whichever retrieves the special product shuts down. This need not be the same always. 
+
 A sample output of the fixed program is given in output.txt file in the Fixed Directory.
